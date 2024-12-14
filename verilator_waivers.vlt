@@ -1,0 +1,7 @@
+//========================================================================
+// Waivers
+//========================================================================
+// Use these to ignore specific warnings from Verilator
+
+`verilator_config
+lint_off -rule DECLFILENAME
