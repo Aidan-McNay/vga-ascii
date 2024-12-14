@@ -14,7 +14,7 @@ module Top();
 
   // verilator lint_off UNUSED
   logic clk;
-  logic reset;
+  logic rst;
   // verilator lint_on UNUSED
 
   TestUtils t( .* );

@@ -28,7 +28,7 @@
 module TestUtils
 (
   output logic clk,
-  output logic reset
+  output logic rst
 );
 
   // verilator lint_off BLKSEQ
@@ -43,26 +43,22 @@ module TestUtils
   // This variable holds the +test-case command line argument indicating
   // which test cases to run.
 
-  string vcd_filename;
   int n = 0;
   initial begin
 
     if ( !$value$plusargs( "test-case=%d", n ) )
       n = 0;
 
-    if ( $value$plusargs( "dump-vcd=%s", vcd_filename ) ) begin
-      $dumpfile(vcd_filename);
-      $dumpvars();
-    end
-
   end
 
-  // Always call $urandom with this seed variable to ensure that random
-  // test cases are both isolated and reproducible.
+  function int get_test_suite();
+    if ( !$value$plusargs( "test-suite=%d", get_test_suite ) )
+      get_test_suite = 0;
+  endfunction
 
-  // verilator lint_off UNUSEDSIGNAL
+  // Seed random test cases
   int seed = 32'hdeadbeef;
-  // verilator lint_on UNUSEDSIGNAL
+  initial $urandom(seed);
 
   // Cycle counter with timeout check
 
@@ -70,7 +66,7 @@ module TestUtils
 
   always @( posedge clk ) begin
 
-    if ( reset )
+    if ( rst )
       cycles <= 0;
     else
       cycles <= cycles + 1;
@@ -83,6 +79,31 @@ module TestUtils
   end
 
   //----------------------------------------------------------------------
+  // test_case_begin
+  //----------------------------------------------------------------------
+
+  task test_case_begin( string taskname );
+    $write("\n    %s%s%s ", `BLUE, taskname, `RESET);
+    if ( t.n != 0 )
+      $write("\n");
+
+    seed = 32'hdeadbeef;
+    failed = 0;
+
+    rst = 1;
+    #30;
+    rst = 0;
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_suite_begin
+  //----------------------------------------------------------------------
+
+  task test_suite_begin( string suitename );
+    $write("\n  %s%s%s", `PURPLE, suitename, `RESET);
+  endtask
+
+  //----------------------------------------------------------------------
   // test_bench_begin
   //----------------------------------------------------------------------
   // We start with a #1 delay so that all tasks will essentially start at
@@ -91,6 +112,10 @@ module TestUtils
 
   task test_bench_begin( string filename );
     $write("\nRunning %s", filename);
+    if ( $value$plusargs( "dump-vcd=%s", filename ) ) begin
+      $dumpfile(filename);
+      $dumpvars();
+    end
     #1;
   endtask
 
@@ -103,23 +128,6 @@ module TestUtils
     if ( t.n == 0 )
       $write("\n");
     $finish;
-  endtask
-
-  //----------------------------------------------------------------------
-  // test_case_begin
-  //----------------------------------------------------------------------
-
-  task test_case_begin( string taskname );
-    $write("\n  %s%s%s ", `BLUE, taskname, `RESET);
-    if ( t.n != 0 )
-      $write("\n");
-
-    seed = 32'hdeadbeef;
-    failed = 0;
-
-    reset = 1;
-    #30;
-    reset = 0;
   endtask
 
 endmodule

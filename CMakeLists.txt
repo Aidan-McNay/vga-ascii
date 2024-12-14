@@ -8,6 +8,7 @@
 #-------------------------------------------------------------------------
 
 set(V_TEST_FILES
+  test/CharBuf_test.v
   test/CharLUT_test.v
 )
 
