@@ -33,7 +33,7 @@ if command -v verilator 2>&1 >/dev/null; then
   info "Linting with Verilator..."
   for VERILOG_FILE in $VERILOG_FILES
   do
-    verilator --lint-only -Wall --timing -sv --quiet-stats verilator_waivers.vlt $VERILOG_FILE
+    verilator --lint-only -Wall --timing -sv --quiet-stats -I. -I./hw verilator_waivers.vlt $VERILOG_FILE
     if [ $? != 0 ]; then
         error "Not lint clean"
         exit 1

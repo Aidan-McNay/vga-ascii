@@ -48,7 +48,7 @@ module CharBuf #(
   //----------------------------------------------------------------------
 
   localparam ASCII_ESC = 8'h1B;
-  localparam ASCII_DEL = 8'hFF;
+  localparam ASCII_DEL = 8'h7F;
   localparam ASCII_LF  = 8'h0A;
 
   logic is_esc, is_del, is_newline;
@@ -214,7 +214,8 @@ module CharBuf #(
 
     if( buf_write & ( !is_del ) & ( next_cursor_x == '0 ) ) begin
       // Shifting to a new line
-      next_shift_offset = shift_offset + shift_offset_inc;
+      next_shift_offset = ( shift_offset == ($clog2(p_num_rows))'( p_num_rows - 1 ) ) ? '0 
+                          : shift_offset + shift_offset_inc;
       clr_row           = 1'b1;
       clr_row_idx       = next_cursor_y;
     end
