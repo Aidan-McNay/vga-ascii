@@ -103,10 +103,10 @@ module VGADriver (
     endcase
 
     case( v_state )
-      V_ACTIVE_STATE: if(( v_counter == V_ACTIVE ) & line_done) next_v_state = H_FRONT_STATE;
-      V_FRONT_STATE:  if(( v_counter == V_FRONT  ) & line_done) next_v_state = H_PULSE_STATE;
-      V_PULSE_STATE:  if(( v_counter == V_PULSE  ) & line_done) next_v_state = H_BACK_STATE;
-      V_BACK_STATE:   if(( v_counter == V_BACK   ) & line_done) next_v_state = H_ACTIVE_STATE;
+      V_ACTIVE_STATE: if(( v_counter == V_ACTIVE ) & line_done) next_v_state = V_FRONT_STATE;
+      V_FRONT_STATE:  if(( v_counter == V_FRONT  ) & line_done) next_v_state = V_PULSE_STATE;
+      V_PULSE_STATE:  if(( v_counter == V_PULSE  ) & line_done) next_v_state = V_BACK_STATE;
+      V_BACK_STATE:   if(( v_counter == V_BACK   ) & line_done) next_v_state = V_ACTIVE_STATE;
     endcase
   end
 
