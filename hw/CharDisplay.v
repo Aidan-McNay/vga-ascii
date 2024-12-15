@@ -18,7 +18,6 @@ module CharDisplay #(
   parameter p_num_rows                  = 32,
   parameter p_num_cols                  = 32
 ) (
-  input  logic clk,
   input  logic clk_25M,
   input  logic rst,
 
@@ -59,6 +58,7 @@ module CharDisplay #(
     .p_num_rows (p_num_rows),
     .p_num_cols (p_num_cols)
   ) char_buf (
+    .clk (clk_25M),
     .*
   );
 

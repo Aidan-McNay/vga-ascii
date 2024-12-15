@@ -10,7 +10,6 @@ The top-level hardware module is located in `hw/CharDisplay.v`:
 module CharDisplay #(
   ...
 ) (
-  input  logic clk,
   input  logic clk_25M,
   input  logic rst,
 
@@ -33,8 +32,7 @@ module CharDisplay #(
 );
 ```
 
-The module runs on a high-speed clock (assumed to be 50MHz for our target
-FPGAs), as well as a 25MHz clock for the VGA display. The character
+The module runs on a 25MHz clock for the VGA display. The character
 display takes in characters on the ASCII Interface, and manipulates the
 VGA Interface to display a scrolling text display of the provided ASCII
 characters, as though they were typed on a keyboard. Each character is
