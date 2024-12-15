@@ -8,8 +8,8 @@
 `ifndef HW_CHARDISPLAY
 `define HW_CHARDISPLAY
 
-`include "hw/CharBuf.v"
-`include "hw/VGADriver.v"
+`include "CharBuf.v"
+`include "VGADriver.v"
 
 module CharDisplay #(
   parameter logic [11:0] p_text_color   = 12'hFFF,

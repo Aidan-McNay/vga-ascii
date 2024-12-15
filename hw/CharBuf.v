@@ -13,7 +13,7 @@
 `ifndef HW_CHARBUF_V
 `define HW_CHARBUF_V
 
-`include "hw/CharLUT.v"
+`include "CharLUT.v"
 
 module CharBuf #(
   parameter p_num_rows = 32,
