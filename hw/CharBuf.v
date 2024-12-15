@@ -8,6 +8,7 @@
 //
 //  - DEL: Delete the last character and move the cursor back
 //  - ESC: Clear the screen to the reset state
+//  - LF: (Newline) Start a new line
 
 `ifndef HW_CHARBUF_V
 `define HW_CHARBUF_V
@@ -47,14 +48,16 @@ module CharBuf #(
 
   localparam ASCII_ESC = 8'h1B;
   localparam ASCII_DEL = 8'hFF;
+  localparam ASCII_LF  = 8'h0A;
 
-  logic is_esc, is_del;
+  logic is_esc, is_del, is_newline;
 
-  assign is_esc = ( ascii == ASCII_ESC );
-  assign is_del = ( ascii == ASCII_DEL );
+  assign is_esc     = ( ascii == ASCII_ESC );
+  assign is_del     = ( ascii == ASCII_DEL );
+  assign is_newline = ( ascii == ASCII_LF  );
 
   logic buf_write;
-  assign buf_write = ascii_val & ( !is_esc ) & ( !is_del );
+  assign buf_write = ascii_val;
 
   //----------------------------------------------------------------------
   // Create memory
@@ -161,8 +164,18 @@ module CharBuf #(
     // Decrement on deletion
     //--------------------------------------------------------------------
 
-    if( is_del ) begin
-      next_cursor_x = cursor_x - 1;
+    if( is_del & buf_write ) begin
+      if( cursor_x != '0 )
+        next_cursor_x = cursor_x - 1;
+    end
+
+    //--------------------------------------------------------------------
+    // Go to next line on newline
+    //--------------------------------------------------------------------
+
+    else if( is_newline & buf_write ) begin
+      next_cursor_x = '0;
+      next_cursor_y = cursor_y + 1;
     end
 
     //--------------------------------------------------------------------
@@ -184,8 +197,8 @@ module CharBuf #(
   logic [$clog2(p_num_rows)-1:0] next_shift_offset;
 
   always_ff @( posedge clk ) begin
-    if     ( rst        ) shift_offset <= '0 - 'd1;
-    else if( clr_screen ) shift_offset <= '0 - 'd1;
+    if     ( rst        ) shift_offset <= 'd1;
+    else if( clr_screen ) shift_offset <= 'd1;
     else                  shift_offset <= next_shift_offset;
   end
 
@@ -194,7 +207,7 @@ module CharBuf #(
     clr_row           = '0;
     clr_row_idx       = '0;
 
-    if( buf_write & ( next_cursor_x == '0 ) ) begin
+    if( buf_write & ( !is_del ) & ( next_cursor_x == '0 ) ) begin
       // Shifting to a new line
       next_shift_offset = shift_offset + 1;
       clr_row           = 1'b1;
@@ -214,7 +227,7 @@ module CharBuf #(
   // Assign reading signals
   //----------------------------------------------------------------------
 
-  assign rrow = ( read_vchar[$clog2(p_num_rows)-1:0] - shift_offset );
+  assign rrow = ( read_vchar[$clog2(p_num_rows)-1:0] + shift_offset );
   assign rcol = read_hchar[$clog2(p_num_cols)-1:0];
 
   //----------------------------------------------------------------------
@@ -247,7 +260,8 @@ module CharBuf #(
     else
       cursor_present <= ( rrow         == cursor_y ) &
                         ( rcol         == cursor_x ) &
-                        ( read_voffset == 3'b111   );
+                        ( read_voffset == 3'b111   ) &
+                        ( read_hoffset != 3'b111   );;
   end
 
   always_comb begin

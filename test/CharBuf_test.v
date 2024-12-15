@@ -133,7 +133,7 @@ module CharBufTestSuite #(
                       dut_read_hchar, dut_read_hoffset, dut_read_lit );
           end
           
-          if( cursor & ( v == 7 ) )
+          if( cursor & ( v == 7 ) & ( h != 7 ) )
             exp_lit = 1'b1;
           else
             exp_lit = oracle_lit;
@@ -182,6 +182,174 @@ module CharBufTestSuite #(
   endtask
 
   //----------------------------------------------------------------------
+  // test_case_3_multi_line
+  //----------------------------------------------------------------------
+
+  task test_case_3_multi_line();
+    t.test_case_begin( "test_case_3_multi_line" );
+
+    for( int i = 0; i < p_num_cols; i = i + 1 ) begin
+      write_ascii( "1" );
+    end
+    write_ascii( "2" );
+
+    for( int i = 0; i < p_num_cols; i = i + 1 ) begin
+      check( "1", 7'(i), 6'(p_num_rows - 2), n );
+    end
+    check( "2", 0, 6'(p_num_rows - 1), n );
+    check( " ", 1, 6'(p_num_rows - 1), y );
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_case_4_overflow
+  //----------------------------------------------------------------------
+
+  task test_case_4_overflow();
+    t.test_case_begin( "test_case_4_overflow" );
+
+    for( int r = 0; r < p_num_rows; r = r + 1 ) begin
+      for( int c = 0; c < p_num_cols; c = c + 1 ) begin
+        write_ascii( 8'(r + 65) );
+      end
+    end
+
+    for( int r = 0; r < p_num_rows; r = r + 1 ) begin
+      for( int c = 0; c < p_num_cols; c = c + 1 ) begin
+        if( r == p_num_rows - 1 )
+          check( " ", 7'(c), 6'(r), 1'( c == 0 ) );
+        else
+          check( 8'(r + 66), 7'(c), 6'(r), n );
+      end
+    end
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_case_5_delete
+  //----------------------------------------------------------------------
+
+  localparam DEL = 8'hFF;
+
+  task test_case_5_delete();
+    t.test_case_begin( "test_case_5_delete" );
+
+    write_ascii( "A" );
+    write_ascii( "B" );
+    write_ascii( "C" );
+    write_ascii( DEL );
+    write_ascii( DEL );
+    write_ascii( "D" );
+    write_ascii( "E" );
+
+    check( "A", 0, 6'(p_num_rows - 1), n );
+    check( "D", 1, 6'(p_num_rows - 1), n );
+    check( "E", 2, 6'(p_num_rows - 1), n );
+    check( " ", 3, 6'(p_num_rows - 1), y );
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_case_6_multi_line_delete
+  //----------------------------------------------------------------------
+
+  task test_case_6_multi_line_delete();
+    t.test_case_begin( "test_case_6_multi_line_delete" );
+
+    for( int i = 0; i < p_num_cols; i = i + 1 ) begin
+      write_ascii( "P" );
+    end
+    write_ascii( "2" );
+    write_ascii( DEL );
+    write_ascii( DEL );
+    write_ascii( DEL );
+
+    for( int i = 0; i < p_num_cols; i = i + 1 ) begin
+      check( "P", 7'(i), 6'(p_num_rows - 2), n );
+    end
+    check( " ", 0, 6'(p_num_rows - 1), y );
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_case_7_newline
+  //----------------------------------------------------------------------
+
+  localparam LF = 8'h0A;
+
+  task test_case_7_newline();
+    t.test_case_begin( "test_case_7_newline" );
+
+    write_ascii( "E" );
+    write_ascii( LF );
+    write_ascii( "C" );
+    write_ascii( LF );
+    write_ascii( "E" );
+    write_ascii( LF );
+
+    check( "E", 0, 6'(p_num_rows - 4), n );
+    check( "C", 0, 6'(p_num_rows - 3), n );
+    check( "E", 0, 6'(p_num_rows - 2), n );
+    check( " ", 0, 6'(p_num_rows - 1), y );
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_case_8_clear
+  //----------------------------------------------------------------------
+
+  localparam ESC = 8'h1B;
+
+  task test_case_8_clear();
+    t.test_case_begin( "test_case_8_clear" );
+
+    write_ascii( "T" );
+    write_ascii( "E" );
+    write_ascii( LF );
+    write_ascii( "S" );
+    write_ascii( "T" );
+    write_ascii( LF );
+    write_ascii( "8" );
+    write_ascii( LF );
+    write_ascii( ESC );
+
+    check( " ", 0, 6'(p_num_rows - 4), n );
+    check( " ", 1, 6'(p_num_rows - 4), n );
+
+    check( " ", 0, 6'(p_num_rows - 3), n );
+    check( " ", 1, 6'(p_num_rows - 3), n );
+
+    check( " ", 0, 6'(p_num_rows - 2), n );
+
+    check( " ", 0, 6'(p_num_rows - 1), y );
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // print_buf
+  //----------------------------------------------------------------------
+  // A task to print the entire character buffer, for visual debugging
+
+  // verilator lint_off WIDTHTRUNC
+
+  task print_buf();
+    for( int r = 0; r < p_num_rows * 8; r = r + 1 ) begin
+      for( int c = 0; c < p_num_cols * 8; c = c + 1 ) begin
+        { dut_read_hchar, dut_read_hoffset } = c;
+        { dut_read_vchar, dut_read_voffset } = r;
+        #10;
+        if( dut_read_lit )
+          $write(".");
+        else
+          $write(" ");
+      end
+      $write("\n");
+    end
+  endtask
+
+  // verilator lint_on WIDTHTRUNC
+
+  //----------------------------------------------------------------------
   // run_test_suite
   //----------------------------------------------------------------------
 
@@ -189,7 +357,13 @@ module CharBufTestSuite #(
     t.test_suite_begin( suite_name );
 
     if ((t.n <= 0) || (t.n == 1)) test_case_1_basic();
-    if ((t.n <= 0) || (t.n == 1)) test_case_2_multi_char();
+    if ((t.n <= 0) || (t.n == 2)) test_case_2_multi_char();
+    if ((t.n <= 0) || (t.n == 3)) test_case_3_multi_line();
+    if ((t.n <= 0) || (t.n == 4)) test_case_4_overflow();
+    if ((t.n <= 0) || (t.n == 5)) test_case_5_delete();
+    if ((t.n <= 0) || (t.n == 6)) test_case_6_multi_line_delete();
+    if ((t.n <= 0) || (t.n == 7)) test_case_7_newline();
+    if ((t.n <= 0) || (t.n == 8)) test_case_8_clear();
 
   endtask
 
@@ -216,9 +390,10 @@ module Top();
   // Parameterized Test Suites
   //----------------------------------------------------------------------
 
-  CharBufTestSuite #(1)         suite_1();
+  CharBufTestSuite #(1,  8,  8) suite_1();
   CharBufTestSuite #(2, 16, 16) suite_2();
   CharBufTestSuite #(3,  8, 64) suite_3();
+  CharBufTestSuite #(4, 32, 32) suite_4();
 
   //----------------------------------------------------------------------
   // main
