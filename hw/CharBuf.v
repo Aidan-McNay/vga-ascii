@@ -130,11 +130,6 @@ module CharBuf #(
     else      rdata <= mem[rrow][rcol];
   end
 
-  // verilator lint_off UNUSEDSIGNAL
-  logic [7:0] test;
-  assign test = mem[0][0];
-  // verilator lint_on UNUSEDSIGNAL
-
   //----------------------------------------------------------------------
   // Keep track of the cursor
   //----------------------------------------------------------------------
@@ -157,6 +152,12 @@ module CharBuf #(
     end
   end
 
+  logic [$clog2(p_num_rows)-1:0] cursor_y_inc;
+  logic [$clog2(p_num_cols)-1:0] cursor_x_inc;
+
+  assign cursor_y_inc = 'd1;
+  assign cursor_x_inc = 'd1;
+
   always_comb begin
     next_cursor_x = cursor_x;
     next_cursor_y = cursor_y;
@@ -167,7 +168,7 @@ module CharBuf #(
 
     if( is_del & buf_write ) begin
       if( cursor_x != '0 )
-        next_cursor_x = cursor_x - 1;
+        next_cursor_x = cursor_x - cursor_x_inc;
     end
 
     //--------------------------------------------------------------------
@@ -176,7 +177,7 @@ module CharBuf #(
 
     else if( is_newline & buf_write ) begin
       next_cursor_x = '0;
-      next_cursor_y = cursor_y + 1;
+      next_cursor_y = cursor_y + cursor_y_inc;
     end
 
     //--------------------------------------------------------------------
@@ -184,9 +185,9 @@ module CharBuf #(
     //--------------------------------------------------------------------
 
     else if( buf_write ) begin
-      next_cursor_x = cursor_x + 1;
+      next_cursor_x = cursor_x + cursor_x_inc;
       if( next_cursor_x == '0 )
-        next_cursor_y = cursor_y + 1;
+        next_cursor_y = cursor_y + cursor_y_inc;
     end
   end
 
@@ -196,6 +197,9 @@ module CharBuf #(
 
   logic [$clog2(p_num_rows)-1:0] shift_offset;
   logic [$clog2(p_num_rows)-1:0] next_shift_offset;
+  logic [$clog2(p_num_rows)-1:0] shift_offset_inc;
+
+  assign shift_offset_inc = 'd1;
 
   always_ff @( posedge clk ) begin
     if     ( rst        ) shift_offset <= 'd1;
@@ -210,7 +214,7 @@ module CharBuf #(
 
     if( buf_write & ( !is_del ) & ( next_cursor_x == '0 ) ) begin
       // Shifting to a new line
-      next_shift_offset = shift_offset + 1;
+      next_shift_offset = shift_offset + shift_offset_inc;
       clr_row           = 1'b1;
       clr_row_idx       = next_cursor_y;
     end

@@ -84,7 +84,7 @@ foreach(V_TEST_FILE_REL_PATH ${V_TEST_FILES})
   verilate(
     ${V_TEST_BIN} 
     SOURCES ${V_TEST_FILE_PATH} 
-    INCLUDE_DIRS ${V_INCL_DIR}
+    INCLUDE_DIRS ${V_INCL_DIR} "${V_INCL_DIR}/hw"
     PREFIX Vtop
     TRACE
     VERILATOR_ARGS --timing --flatten --quiet-stats
