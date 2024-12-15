@@ -12,10 +12,11 @@
 `include "hw/VGADriver.v"
 
 module CharDisplay #(
-  parameter logic [11:0] p_text_color = 12'hFFF,
-  parameter logic [11:0] p_bg_color   = 12'h000,
-  parameter p_num_rows                = 32,
-  parameter p_num_cols                = 32
+  parameter logic [11:0] p_text_color   = 12'hFFF,
+  parameter logic [11:0] p_bg_color     = 12'h000,
+  parameter logic [11:0] p_screen_color = 12'hFFF,
+  parameter p_num_rows                  = 32,
+  parameter p_num_cols                  = 32
 ) (
   input  logic clk,
   input  logic clk_25M,
@@ -48,6 +49,7 @@ module CharDisplay #(
   logic [2:0] read_hoffset;
   logic [2:0] read_voffset;
   logic       read_lit;
+  logic       out_of_bounds;
 
   logic [3:0] pixel_red;
   logic [3:0] pixel_green;
@@ -69,7 +71,11 @@ module CharDisplay #(
   //----------------------------------------------------------------------
 
   always_comb begin
-    if( read_lit ) begin
+    if( out_of_bounds ) begin
+      pixel_red   = p_screen_color[11:8];
+      pixel_green = p_screen_color[7:4];
+      pixel_blue  = p_screen_color[3:0];
+    end else if( read_lit ) begin
       pixel_red   = p_text_color[11:8];
       pixel_green = p_text_color[7:4];
       pixel_blue  = p_text_color[3:0];

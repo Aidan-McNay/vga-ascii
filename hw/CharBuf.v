@@ -39,7 +39,8 @@ module CharBuf #(
   input  logic [5:0] read_vchar,
   input  logic [2:0] read_hoffset,
   input  logic [2:0] read_voffset,
-  output logic       read_lit
+  output logic       read_lit,
+  output logic       out_of_bounds
 );
 
   //----------------------------------------------------------------------
@@ -250,7 +251,13 @@ module CharBuf #(
 
   assign invalid_hcoord = ( read_hchar >= p_num_cols );
   assign invalid_vcoord = ( read_vchar >= p_num_rows );
-  assign invalid_coord  = invalid_hcoord | invalid_vcoord;
+
+  always_ff @( posedge clk ) begin
+    if( rst )
+      invalid_coord <= 1'b1;
+    else
+      invalid_coord <= invalid_hcoord | invalid_vcoord;
+  end
 
   logic cursor_present;
 
@@ -272,6 +279,8 @@ module CharBuf #(
     else
       read_lit = rdata_lit;
   end
+
+  assign out_of_bounds = invalid_coord;
 
 endmodule
 

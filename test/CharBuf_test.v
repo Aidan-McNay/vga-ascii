@@ -41,6 +41,7 @@ module CharBufTestSuite #(
   logic [2:0] dut_read_hoffset;
   logic [2:0] dut_read_voffset;
   logic       dut_read_lit;
+  logic       dut_out_of_bounds;
 
   CharBuf #(
     .p_num_rows (p_num_rows),
@@ -54,7 +55,8 @@ module CharBufTestSuite #(
     .read_vchar       (dut_read_vchar),
     .read_hoffset     (dut_read_hoffset),
     .read_voffset     (dut_read_voffset),
-    .read_lit         (dut_read_lit)
+    .read_lit         (dut_read_lit),
+    .out_of_bounds    (dut_out_of_bounds)
   );
 
   //----------------------------------------------------------------------
@@ -107,7 +109,8 @@ module CharBufTestSuite #(
     input logic [7:0] ascii_char,
     input logic [6:0] hchar,
     input logic [5:0] vchar,
-    input logic       cursor
+    input logic       cursor,
+    input logic       in_bounds
   );
     if ( !t.failed ) begin
 
@@ -133,12 +136,15 @@ module CharBufTestSuite #(
                       dut_read_hchar, dut_read_hoffset, dut_read_lit );
           end
           
-          if( cursor & ( v == 7 ) & ( h != 7 ) )
+          if( !in_bounds )
+            exp_lit = 1'b0;
+          else if( cursor & ( v == 7 ) & ( h != 7 ) )
             exp_lit = 1'b1;
           else
             exp_lit = oracle_lit;
           
-          `CHECK_EQ( dut_read_lit, exp_lit );
+          `CHECK_EQ( dut_read_lit,      exp_lit );
+          `CHECK_EQ( dut_out_of_bounds, !in_bounds );
         end
       end
     end
@@ -156,8 +162,8 @@ module CharBufTestSuite #(
 
     write_ascii( "A" );
 
-    check( "A", 0, 6'(p_num_rows - 1), n );
-    check( " ", 1, 6'(p_num_rows - 1), y );
+    check( "A", 0, 6'(p_num_rows - 1), n, y );
+    check( " ", 1, 6'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -173,11 +179,11 @@ module CharBufTestSuite #(
     write_ascii( "0" );
     write_ascii( "0" );
 
-    check( "2", 0, 6'(p_num_rows - 1), n );
-    check( "3", 1, 6'(p_num_rows - 1), n );
-    check( "0", 2, 6'(p_num_rows - 1), n );
-    check( "0", 3, 6'(p_num_rows - 1), n );
-    check( " ", 4, 6'(p_num_rows - 1), y );
+    check( "2", 0, 6'(p_num_rows - 1), n, y );
+    check( "3", 1, 6'(p_num_rows - 1), n, y );
+    check( "0", 2, 6'(p_num_rows - 1), n, y );
+    check( "0", 3, 6'(p_num_rows - 1), n, y );
+    check( " ", 4, 6'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -194,10 +200,10 @@ module CharBufTestSuite #(
     write_ascii( "2" );
 
     for( int i = 0; i < p_num_cols; i = i + 1 ) begin
-      check( "1", 7'(i), 6'(p_num_rows - 2), n );
+      check( "1", 7'(i), 6'(p_num_rows - 2), n, y );
     end
-    check( "2", 0, 6'(p_num_rows - 1), n );
-    check( " ", 1, 6'(p_num_rows - 1), y );
+    check( "2", 0, 6'(p_num_rows - 1), n, y );
+    check( " ", 1, 6'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -217,9 +223,9 @@ module CharBufTestSuite #(
     for( int r = 0; r < p_num_rows; r = r + 1 ) begin
       for( int c = 0; c < p_num_cols; c = c + 1 ) begin
         if( r == p_num_rows - 1 )
-          check( " ", 7'(c), 6'(r), 1'( c == 0 ) );
+          check( " ", 7'(c), 6'(r), 1'( c == 0 ), y );
         else
-          check( 8'(r + 66), 7'(c), 6'(r), n );
+          check( 8'(r + 66), 7'(c), 6'(r), n, y );
       end
     end
 
@@ -242,10 +248,10 @@ module CharBufTestSuite #(
     write_ascii( "D" );
     write_ascii( "E" );
 
-    check( "A", 0, 6'(p_num_rows - 1), n );
-    check( "D", 1, 6'(p_num_rows - 1), n );
-    check( "E", 2, 6'(p_num_rows - 1), n );
-    check( " ", 3, 6'(p_num_rows - 1), y );
+    check( "A", 0, 6'(p_num_rows - 1), n, y );
+    check( "D", 1, 6'(p_num_rows - 1), n, y );
+    check( "E", 2, 6'(p_num_rows - 1), n, y );
+    check( " ", 3, 6'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -265,9 +271,9 @@ module CharBufTestSuite #(
     write_ascii( DEL );
 
     for( int i = 0; i < p_num_cols; i = i + 1 ) begin
-      check( "P", 7'(i), 6'(p_num_rows - 2), n );
+      check( "P", 7'(i), 6'(p_num_rows - 2), n, y );
     end
-    check( " ", 0, 6'(p_num_rows - 1), y );
+    check( " ", 0, 6'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -287,10 +293,10 @@ module CharBufTestSuite #(
     write_ascii( "E" );
     write_ascii( LF );
 
-    check( "E", 0, 6'(p_num_rows - 4), n );
-    check( "C", 0, 6'(p_num_rows - 3), n );
-    check( "E", 0, 6'(p_num_rows - 2), n );
-    check( " ", 0, 6'(p_num_rows - 1), y );
+    check( "E", 0, 6'(p_num_rows - 4), n, y );
+    check( "C", 0, 6'(p_num_rows - 3), n, y );
+    check( "E", 0, 6'(p_num_rows - 2), n, y );
+    check( " ", 0, 6'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -313,15 +319,30 @@ module CharBufTestSuite #(
     write_ascii( LF );
     write_ascii( ESC );
 
-    check( " ", 0, 6'(p_num_rows - 4), n );
-    check( " ", 1, 6'(p_num_rows - 4), n );
+    check( " ", 0, 6'(p_num_rows - 4), n, y );
+    check( " ", 1, 6'(p_num_rows - 4), n, y );
 
-    check( " ", 0, 6'(p_num_rows - 3), n );
-    check( " ", 1, 6'(p_num_rows - 3), n );
+    check( " ", 0, 6'(p_num_rows - 3), n, y );
+    check( " ", 1, 6'(p_num_rows - 3), n, y );
 
-    check( " ", 0, 6'(p_num_rows - 2), n );
+    check( " ", 0, 6'(p_num_rows - 2), n, y );
 
-    check( " ", 0, 6'(p_num_rows - 1), y );
+    check( " ", 0, 6'(p_num_rows - 1), y, y );
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_case_9_out_of_bounds
+  //----------------------------------------------------------------------
+
+  task test_case_9_out_of_bounds();
+    t.test_case_begin( "test_case_9_out_of_bounds" );
+
+    for( int r = p_num_rows; r < p_num_rows + 2; r = r + 1 ) begin
+      for( int c = p_num_cols; c < p_num_cols + 2; c = c + 1 ) begin
+        check( " ", 7'(c), 6'(r), n, n );
+      end
+    end
 
   endtask
 
@@ -364,6 +385,7 @@ module CharBufTestSuite #(
     if ((t.n <= 0) || (t.n == 6)) test_case_6_multi_line_delete();
     if ((t.n <= 0) || (t.n == 7)) test_case_7_newline();
     if ((t.n <= 0) || (t.n == 8)) test_case_8_clear();
+    if ((t.n <= 0) || (t.n == 9)) test_case_9_out_of_bounds();
 
   endtask
 
