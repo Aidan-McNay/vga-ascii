@@ -25,7 +25,7 @@
 `define HW_CHARLUT_V
 
 module CharLUT (
-  input  logic [7:0] char,
+  input  logic [7:0] ascii_char,
   input  logic [2:0] vidx,
   input  logic [2:0] hidx,
   output logic       lit
@@ -41,7 +41,7 @@ module CharLUT (
   logic [63:0] char_pix;
 
   always_comb begin
-    case( char )
+    case( ascii_char )
       " ":     char_pix = { 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00};   // U+0020 (space)
       "!":     char_pix = { 8'h18, 8'h3C, 8'h3C, 8'h18, 8'h18, 8'h00, 8'h18, 8'h00};   // U+0021 (!)
       "\"":    char_pix = { 8'h36, 8'h36, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00};   // U+0022 (")

@@ -61,16 +61,16 @@ module CharBufTestSuite #(
   // Instantiate a CharLUT to get the expected answer
   //----------------------------------------------------------------------
 
-  logic [7:0] oracle_char;
+  logic [7:0] oracle_ascii_char;
   logic [2:0] oracle_vidx;
   logic [2:0] oracle_hidx;
   logic       oracle_lit;
 
   CharLUT oracle (
-    .char (oracle_char),
-    .vidx (oracle_vidx),
-    .hidx (oracle_hidx),
-    .lit  (oracle_lit)
+    .ascii_char (oracle_ascii_char),
+    .vidx       (oracle_vidx),
+    .hidx       (oracle_hidx),
+    .lit        (oracle_lit)
   );
 
   //----------------------------------------------------------------------
@@ -83,9 +83,9 @@ module CharBufTestSuite #(
 
   task write_ascii
   (
-    input logic [7:0] char
+    input logic [7:0] ascii_char
   );
-    dut_ascii = char;
+    dut_ascii     = ascii_char;
     dut_ascii_val = 1'b1;
 
     #10;
@@ -104,16 +104,16 @@ module CharBufTestSuite #(
 
   task check
   (
-    input logic [7:0] char,
+    input logic [7:0] ascii_char,
     input logic [6:0] hchar,
     input logic [5:0] vchar,
     input logic       cursor
   );
     if ( !t.failed ) begin
 
-      dut_read_hchar = hchar;
-      dut_read_vchar = vchar;
-      oracle_char    = char;
+      dut_read_hchar    = hchar;
+      dut_read_vchar    = vchar;
+      oracle_ascii_char = ascii_char;
 
       for( int h = 0; h < 8; h = h + 1 ) begin
         for( int v = 0; v < 8; v = v + 1 ) begin
@@ -129,7 +129,7 @@ module CharBufTestSuite #(
 
           if ( t.n != 0 ) begin
             $display( "%3d: %s (%d.%d,%d.%d) > %b", t.cycles,
-                      char, dut_read_vchar, dut_read_voffset, 
+                      ascii_char, dut_read_vchar, dut_read_voffset, 
                       dut_read_hchar, dut_read_hoffset, dut_read_lit );
           end
           

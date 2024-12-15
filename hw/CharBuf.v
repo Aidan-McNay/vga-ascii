@@ -238,10 +238,10 @@ module CharBuf #(
   logic rdata_lit;
 
   CharLUT char_lut (
-    .char (rdata),
-    .vidx (read_voffset),
-    .hidx (read_hoffset),
-    .lit  (rdata_lit)
+    .ascii_char (rdata),
+    .vidx       (read_voffset),
+    .hidx       (read_hoffset),
+    .lit        (rdata_lit)
   );
   
   logic invalid_hcoord;

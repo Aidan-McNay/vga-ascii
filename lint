@@ -4,7 +4,7 @@
 #=========================================================================
 # A helper script for linting the Verilog components
 
-VERILOG_TESTS=$(find . -name "*_test.v")
+VERILOG_FILES=$(find . -name "*.v" ! -name 'utils.v')
 
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -31,9 +31,9 @@ success() {
 
 if command -v verilator 2>&1 >/dev/null; then
   info "Linting with Verilator..."
-  for VERILOG_TEST in $VERILOG_TESTS
+  for VERILOG_FILE in $VERILOG_FILES
   do
-    verilator --lint-only -Wall --timing -sv --quiet-stats verilator_waivers.vlt $VERILOG_TEST
+    verilator --lint-only -Wall --timing -sv --quiet-stats verilator_waivers.vlt $VERILOG_FILE
     if [ $? != 0 ]; then
         error "Not lint clean"
         exit 1

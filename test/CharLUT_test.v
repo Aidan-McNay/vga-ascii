@@ -23,16 +23,16 @@ module Top();
   // Instantiate design under test
   //----------------------------------------------------------------------
 
-  logic [7:0] dut_char;
+  logic [7:0] dut_ascii_char;
   logic [2:0] dut_vidx;
   logic [2:0] dut_hidx;
   logic       dut_lit;
 
   CharLUT dut (
-    .char (dut_char),
-    .vidx (dut_vidx),
-    .hidx (dut_hidx),
-    .lit  (dut_lit)
+    .ascii_char (dut_ascii_char),
+    .vidx       (dut_vidx),
+    .hidx       (dut_hidx),
+    .lit        (dut_lit)
   );
 
   //----------------------------------------------------------------------
@@ -44,22 +44,22 @@ module Top();
 
   task check
   (
-    input logic [7:0] char,
+    input logic [7:0] ascii_char,
     input logic [2:0] vidx,
     input logic [2:0] hidx,
     input logic       lit
   );
     if ( !t.failed ) begin
 
-      dut_char = char;
-      dut_vidx = vidx;
-      dut_hidx = hidx;
+      dut_ascii_char = ascii_char;
+      dut_vidx       = vidx;
+      dut_hidx       = hidx;
 
       #8;
 
       if ( t.n != 0 ) begin
         $display( "%3d: %s (%d,%d) > %b", t.cycles,
-                  dut_char, dut_vidx, dut_hidx, dut_lit );
+                  dut_ascii_char, dut_vidx, dut_hidx, dut_lit );
       end
 
       `CHECK_EQ( dut_lit, lit );
@@ -95,12 +95,12 @@ module Top();
   // Check the full character of "q"
 
   task check_row(
-    input logic [7:0] char,
+    input logic [7:0] ascii_char,
     input logic [2:0] row, 
     input logic [7:0] lits
   );
     for( logic [3:0] col = 0; col < 4'd8; col = col + 4'd1 ) begin
-      check( char, row, col[2:0], lits[col[2:0]] );
+      check( ascii_char, row, col[2:0], lits[col[2:0]] );
     end
   endtask
 
