@@ -241,11 +241,23 @@ module CharBuf #(
   // Use a CharLUT to decipher the stored ASCII character
 
   logic rdata_lit;
+  logic [2:0] read_hoffset_buf;
+  logic [2:0] read_voffset_buf;
+
+  always_ff @( posedge clk ) begin
+    if( rst ) begin
+      read_hoffset_buf <= '0;
+      read_voffset_buf <= '0;
+    end else begin
+      read_hoffset_buf <= read_hoffset;
+      read_voffset_buf <= read_voffset;
+    end
+  end
 
   CharLUT char_lut (
     .ascii_char (rdata),
-    .vidx       (read_voffset),
-    .hidx       (read_hoffset),
+    .vidx       (read_voffset_buf),
+    .hidx       (read_hoffset_buf),
     .lit        (rdata_lit)
   );
   
