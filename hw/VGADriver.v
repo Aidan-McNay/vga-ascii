@@ -19,9 +19,9 @@ module VGADriver (
   // pixel colors for a given coordinate should come back one cycle later
 
   output  logic [6:0] read_hchar,
-  output  logic [5:0] read_vchar,
+  output  logic [4:0] read_vchar,
   output  logic [2:0] read_hoffset,
-  output  logic [2:0] read_voffset,
+  output  logic [3:0] read_voffset,
   
   input   logic [3:0] pixel_red,
   input   logic [3:0] pixel_green,
@@ -193,8 +193,8 @@ module VGADriver (
 
   assign read_hchar   = h_counter[9:3];
   assign read_hoffset = h_counter[2:0];
-  assign read_vchar   = v_counter[8:3];
-  assign read_voffset = v_counter[2:0];
+  assign read_vchar   = v_counter[8:4];
+  assign read_voffset = v_counter[3:0];
 
   //----------------------------------------------------------------------
   // Remaining signals

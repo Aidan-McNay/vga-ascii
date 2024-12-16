@@ -15,7 +15,7 @@ module CharDisplay #(
   parameter logic [11:0] p_text_color   = 12'hFFF,
   parameter logic [11:0] p_bg_color     = 12'h000,
   parameter logic [11:0] p_screen_color = 12'hFFF,
-  parameter p_num_rows                  = 32,
+  parameter p_num_rows                  = 16,
   parameter p_num_cols                  = 32
 ) (
   input  logic clk_25M,
@@ -44,9 +44,9 @@ module CharDisplay #(
   //----------------------------------------------------------------------
 
   logic [6:0] read_hchar;
-  logic [5:0] read_vchar;
+  logic [4:0] read_vchar;
   logic [2:0] read_hoffset;
-  logic [2:0] read_voffset;
+  logic [3:0] read_voffset;
   logic       read_lit;
   logic       out_of_bounds;
 

@@ -4,7 +4,7 @@
 #=========================================================================
 # A helper script for linting the Verilog components
 
-VERILOG_FILES=$(find . -name "*.v" ! -name 'utils.v')
+VERILOG_FILES=$(find ./hw ./test -name "*.v" ! -name 'utils.v')
 
 RED='\033[1;31m'
 GREEN='\033[1;32m'

@@ -24,7 +24,7 @@ module Top();
   //----------------------------------------------------------------------
 
   logic [7:0] dut_ascii_char;
-  logic [2:0] dut_vidx;
+  logic [3:0] dut_vidx;
   logic [2:0] dut_hidx;
   logic       dut_lit;
 
@@ -45,7 +45,7 @@ module Top();
   task check
   (
     input logic [7:0] ascii_char,
-    input logic [2:0] vidx,
+    input logic [3:0] vidx,
     input logic [2:0] hidx,
     input logic       lit
   );
@@ -78,14 +78,14 @@ module Top();
     t.test_case_begin( "test_case_1_basic" );
 
     //     char vidx hidx lit
-    check( "A", 0,   0,   0 );
-    check( "A", 0,   1,   0 );
-    check( "A", 0,   2,   1 );
-    check( "A", 0,   3,   1 );
-    check( "A", 0,   4,   0 );
-    check( "A", 0,   5,   0 );
-    check( "A", 0,   6,   0 );
-    check( "A", 0,   7,   0 );
+    check( "A", 3,   0,   0 );
+    check( "A", 3,   1,   0 );
+    check( "A", 3,   2,   1 );
+    check( "A", 3,   3,   0 );
+    check( "A", 3,   4,   1 );
+    check( "A", 3,   5,   0 );
+    check( "A", 3,   6,   0 );
+    check( "A", 3,   7,   0 );
 
   endtask
 
@@ -96,7 +96,7 @@ module Top();
 
   task check_row(
     input logic [7:0] ascii_char,
-    input logic [2:0] row, 
+    input logic [3:0] row, 
     input logic [7:0] lits
   );
     for( logic [3:0] col = 0; col < 4'd8; col = col + 4'd1 ) begin
@@ -107,14 +107,22 @@ module Top();
   task test_case_2_full_char();
     t.test_case_begin( "test_case_2_full_char" );
 
-    check_row( "q", 0, 8'b00000000 );
-    check_row( "q", 1, 8'b00000000 );
-    check_row( "q", 2, 8'b01101110 );
-    check_row( "q", 3, 8'b00110011 );
-    check_row( "q", 4, 8'b00110011 );
-    check_row( "q", 5, 8'b00111110 );
-    check_row( "q", 6, 8'b00110000 );
-    check_row( "q", 7, 8'b01111000 );
+    check_row( "q",  0, 8'b00000000 );
+    check_row( "q",  1, 8'b00000000 );
+    check_row( "q",  2, 8'b00000000 );
+    check_row( "q",  3, 8'b00000000 );
+    check_row( "q",  4, 8'b00000000 );
+    check_row( "q",  5, 8'b00000000 );
+    check_row( "q",  6, 8'b01111100 );
+    check_row( "q",  7, 8'b01000010 );
+    check_row( "q",  8, 8'b01000010 );
+    check_row( "q",  9, 8'b01000010 );
+    check_row( "q", 10, 8'b01000010 );
+    check_row( "q", 11, 8'b01000010 );
+    check_row( "q", 12, 8'b01111100 );
+    check_row( "q", 13, 8'b01000000 );
+    check_row( "q", 14, 8'b01000000 );
+    check_row( "q", 15, 8'b01000000 );
 
   endtask
 

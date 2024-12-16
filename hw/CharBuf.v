@@ -16,7 +16,7 @@
 `include "CharLUT.v"
 
 module CharBuf #(
-  parameter p_num_rows = 32,
+  parameter p_num_rows = 16,
   parameter p_num_cols = 32
 )(
   input  logic clk,
@@ -36,9 +36,9 @@ module CharBuf #(
   // screen. Reads have a one-cycle latency
 
   input  logic [6:0] read_hchar,
-  input  logic [5:0] read_vchar,
+  input  logic [4:0] read_vchar,
   input  logic [2:0] read_hoffset,
-  input  logic [2:0] read_voffset,
+  input  logic [3:0] read_voffset,
   output logic       read_lit,
   output logic       out_of_bounds
 );
@@ -226,7 +226,7 @@ module CharBuf #(
   //----------------------------------------------------------------------
 
   assign wrow  = cursor_y;
-  assign wcol  = cursor_x;
+  assign wcol  = ( is_del ) ? next_cursor_x : cursor_x;
   assign wdata = ( is_del ) ? 8'h0 : ascii;
 
   //----------------------------------------------------------------------
@@ -243,7 +243,7 @@ module CharBuf #(
 
   logic rdata_lit;
   logic [2:0] read_hoffset_buf;
-  logic [2:0] read_voffset_buf;
+  logic [3:0] read_voffset_buf;
 
   always_ff @( posedge clk ) begin
     if( rst ) begin
@@ -284,7 +284,7 @@ module CharBuf #(
     else
       cursor_present <= ( rrow         == cursor_y ) &
                         ( rcol         == cursor_x ) &
-                        ( read_voffset == 3'b111   ) &
+                        ( read_voffset == 4'b1111  ) &
                         ( read_hoffset != 3'b111   );
   end
 
