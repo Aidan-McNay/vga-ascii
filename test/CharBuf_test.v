@@ -14,7 +14,7 @@
 
 module CharBufTestSuite #(
   parameter p_suite_num = 0,
-  parameter p_num_rows  = 32,
+  parameter p_num_rows  = 16,
   parameter p_num_cols  = 32
 );
 
@@ -37,9 +37,9 @@ module CharBufTestSuite #(
   logic [7:0] dut_ascii;
   logic       dut_ascii_val;
   logic [6:0] dut_read_hchar;
-  logic [5:0] dut_read_vchar;
+  logic [4:0] dut_read_vchar;
   logic [2:0] dut_read_hoffset;
-  logic [2:0] dut_read_voffset;
+  logic [3:0] dut_read_voffset;
   logic       dut_read_lit;
   logic       dut_out_of_bounds;
 
@@ -64,7 +64,7 @@ module CharBufTestSuite #(
   //----------------------------------------------------------------------
 
   logic [7:0] oracle_ascii_char;
-  logic [2:0] oracle_vidx;
+  logic [3:0] oracle_vidx;
   logic [2:0] oracle_hidx;
   logic       oracle_lit;
 
@@ -101,14 +101,14 @@ module CharBufTestSuite #(
   // All tasks start at #1 after the rising edge of the clock.
 
   logic [2:0] hoffset;
-  logic [2:0] voffset;
+  logic [3:0] voffset;
   logic       exp_lit;
 
   task check
   (
     input logic [7:0] ascii_char,
     input logic [6:0] hchar,
-    input logic [5:0] vchar,
+    input logic [4:0] vchar,
     input logic       cursor,
     input logic       in_bounds
   );
@@ -119,9 +119,9 @@ module CharBufTestSuite #(
       oracle_ascii_char = ascii_char;
 
       for( int h = 0; h < 8; h = h + 1 ) begin
-        for( int v = 0; v < 8; v = v + 1 ) begin
+        for( int v = 0; v < 16; v = v + 1 ) begin
           hoffset = 3'(h);
-          voffset = 3'(v);
+          voffset = 4'(v);
 
           dut_read_hoffset = hoffset;
           dut_read_voffset = voffset;
@@ -138,7 +138,7 @@ module CharBufTestSuite #(
           
           if( !in_bounds )
             exp_lit = 1'b0;
-          else if( cursor & ( v == 7 ) & ( h != 7 ) )
+          else if( cursor & ( v == 15 ) & ( h != 7 ) )
             exp_lit = 1'b1;
           else
             exp_lit = oracle_lit;
@@ -162,8 +162,8 @@ module CharBufTestSuite #(
 
     write_ascii( "A" );
 
-    check( "A", 0, 6'(p_num_rows - 1), n, y );
-    check( " ", 1, 6'(p_num_rows - 1), y, y );
+    check( "A", 0, 5'(p_num_rows - 1), n, y );
+    check( " ", 1, 5'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -179,11 +179,11 @@ module CharBufTestSuite #(
     write_ascii( "0" );
     write_ascii( "0" );
 
-    check( "2", 0, 6'(p_num_rows - 1), n, y );
-    check( "3", 1, 6'(p_num_rows - 1), n, y );
-    check( "0", 2, 6'(p_num_rows - 1), n, y );
-    check( "0", 3, 6'(p_num_rows - 1), n, y );
-    check( " ", 4, 6'(p_num_rows - 1), y, y );
+    check( "2", 0, 5'(p_num_rows - 1), n, y );
+    check( "3", 1, 5'(p_num_rows - 1), n, y );
+    check( "0", 2, 5'(p_num_rows - 1), n, y );
+    check( "0", 3, 5'(p_num_rows - 1), n, y );
+    check( " ", 4, 5'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -200,10 +200,10 @@ module CharBufTestSuite #(
     write_ascii( "2" );
 
     for( int i = 0; i < p_num_cols; i = i + 1 ) begin
-      check( "1", 7'(i), 6'(p_num_rows - 2), n, y );
+      check( "1", 7'(i), 5'(p_num_rows - 2), n, y );
     end
-    check( "2", 0, 6'(p_num_rows - 1), n, y );
-    check( " ", 1, 6'(p_num_rows - 1), y, y );
+    check( "2", 0, 5'(p_num_rows - 1), n, y );
+    check( " ", 1, 5'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -223,9 +223,9 @@ module CharBufTestSuite #(
     for( int r = 0; r < p_num_rows; r = r + 1 ) begin
       for( int c = 0; c < p_num_cols; c = c + 1 ) begin
         if( r == p_num_rows - 1 )
-          check( " ", 7'(c), 6'(r), 1'( c == 0 ), y );
+          check( " ", 7'(c), 5'(r), 1'( c == 0 ), y );
         else
-          check( 8'(r + 66), 7'(c), 6'(r), n, y );
+          check( 8'(r + 66), 7'(c), 5'(r), n, y );
       end
     end
 
@@ -248,10 +248,10 @@ module CharBufTestSuite #(
     write_ascii( "D" );
     write_ascii( "E" );
 
-    check( "A", 0, 6'(p_num_rows - 1), n, y );
-    check( "D", 1, 6'(p_num_rows - 1), n, y );
-    check( "E", 2, 6'(p_num_rows - 1), n, y );
-    check( " ", 3, 6'(p_num_rows - 1), y, y );
+    check( "A", 0, 5'(p_num_rows - 1), n, y );
+    check( "D", 1, 5'(p_num_rows - 1), n, y );
+    check( "E", 2, 5'(p_num_rows - 1), n, y );
+    check( " ", 3, 5'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -271,9 +271,9 @@ module CharBufTestSuite #(
     write_ascii( DEL );
 
     for( int i = 0; i < p_num_cols; i = i + 1 ) begin
-      check( "P", 7'(i), 6'(p_num_rows - 2), n, y );
+      check( "P", 7'(i), 5'(p_num_rows - 2), n, y );
     end
-    check( " ", 0, 6'(p_num_rows - 1), y, y );
+    check( " ", 0, 5'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -293,10 +293,10 @@ module CharBufTestSuite #(
     write_ascii( "E" );
     write_ascii( LF );
 
-    check( "E", 0, 6'(p_num_rows - 4), n, y );
-    check( "C", 0, 6'(p_num_rows - 3), n, y );
-    check( "E", 0, 6'(p_num_rows - 2), n, y );
-    check( " ", 0, 6'(p_num_rows - 1), y, y );
+    check( "E", 0, 5'(p_num_rows - 4), n, y );
+    check( "C", 0, 5'(p_num_rows - 3), n, y );
+    check( "E", 0, 5'(p_num_rows - 2), n, y );
+    check( " ", 0, 5'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -319,15 +319,15 @@ module CharBufTestSuite #(
     write_ascii( LF );
     write_ascii( ESC );
 
-    check( " ", 0, 6'(p_num_rows - 4), n, y );
-    check( " ", 1, 6'(p_num_rows - 4), n, y );
+    check( " ", 0, 5'(p_num_rows - 4), n, y );
+    check( " ", 1, 5'(p_num_rows - 4), n, y );
 
-    check( " ", 0, 6'(p_num_rows - 3), n, y );
-    check( " ", 1, 6'(p_num_rows - 3), n, y );
+    check( " ", 0, 5'(p_num_rows - 3), n, y );
+    check( " ", 1, 5'(p_num_rows - 3), n, y );
 
-    check( " ", 0, 6'(p_num_rows - 2), n, y );
+    check( " ", 0, 5'(p_num_rows - 2), n, y );
 
-    check( " ", 0, 6'(p_num_rows - 1), y, y );
+    check( " ", 0, 5'(p_num_rows - 1), y, y );
 
   endtask
 
@@ -340,7 +340,7 @@ module CharBufTestSuite #(
 
     for( int r = p_num_rows; r < p_num_rows + 2; r = r + 1 ) begin
       for( int c = p_num_cols; c < p_num_cols + 2; c = c + 1 ) begin
-        check( " ", 7'(c), 6'(r), n, n );
+        check( " ", 7'(c), 5'(r), n, n );
       end
     end
 
@@ -415,7 +415,7 @@ module Top();
   CharBufTestSuite #(1,  8,  8) suite_1();
   CharBufTestSuite #(2, 16, 16) suite_2();
   CharBufTestSuite #(3,  8, 64) suite_3();
-  CharBufTestSuite #(4, 32, 32) suite_4();
+  CharBufTestSuite #(4, 16, 32) suite_4();
 
   //----------------------------------------------------------------------
   // main
