@@ -1,6 +1,6 @@
 # vga-ascii
 
-A SystemVerilog driver to output a scrolling text display from ASCII input
+A (System)Verilog driver to output a scrolling text display from ASCII input
 
 <p align="center">
   <img src="./assets/screen_example.jpg" alt="drawing" style="width:60%;"/>
