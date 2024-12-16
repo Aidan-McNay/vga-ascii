@@ -49,8 +49,8 @@ for value, idx in glyph_indeces:
     rows = bitmap.rows
     pixels = bitmap.buffer
 
-    if width != 8 or rows != 16:
-        print(f"Character {glyph_name} not 8x16; continuing...")
+    if width != 8:
+        print(f"Character {glyph_name} not 8x16 ({width}x{rows}); continuing...")
         continue
 
     if value >= 256:
@@ -60,6 +60,9 @@ for value, idx in glyph_indeces:
     case_statement_str = f"      {glyph_value}: char_pix = "
 
     pixel_binary = ["{0:08b}".format(x) for x in pixels]
+    while len(pixel_binary) < 16:
+        pixel_binary = ["00000000"] + pixel_binary
+    pixel_binary = pixel_binary[:16]
     pixels = [f"8'b{x[::-1]}" for x in pixel_binary]
     case_statement_str += "{ " + ", ".join(pixels) + " };"
     case_statement_strs.append(case_statement_str)
