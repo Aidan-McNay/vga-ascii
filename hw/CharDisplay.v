@@ -71,6 +71,10 @@ module CharDisplay #(
   //----------------------------------------------------------------------
 
   always_comb begin
+    pixel_red   = p_bg_color[11:8];
+    pixel_green = p_bg_color[7:4];
+    pixel_blue  = p_bg_color[3:0];
+  
     if( out_of_bounds ) begin
       pixel_red   = p_screen_color[11:8];
       pixel_green = p_screen_color[7:4];
@@ -79,10 +83,6 @@ module CharDisplay #(
       pixel_red   = p_text_color[11:8];
       pixel_green = p_text_color[7:4];
       pixel_blue  = p_text_color[3:0];
-    end else begin
-      pixel_red   = p_bg_color[11:8];
-      pixel_green = p_bg_color[7:4];
-      pixel_blue  = p_bg_color[3:0];
     end
   end
 

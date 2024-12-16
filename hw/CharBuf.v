@@ -75,7 +75,7 @@ module CharBuf #(
   logic                          clr_row;
   logic [$clog2(p_num_rows)-1:0] clr_row_idx;
 
-  assign clr_screen = is_esc;
+  assign clr_screen = is_esc & buf_write;
 
   logic [7:0] mem [p_num_rows-1:0] [p_num_cols-1:0];
 
@@ -285,7 +285,7 @@ module CharBuf #(
       cursor_present <= ( rrow         == cursor_y ) &
                         ( rcol         == cursor_x ) &
                         ( read_voffset == 3'b111   ) &
-                        ( read_hoffset != 3'b111   );;
+                        ( read_hoffset != 3'b111   );
   end
 
   always_comb begin

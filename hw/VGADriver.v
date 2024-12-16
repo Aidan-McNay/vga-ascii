@@ -200,9 +200,13 @@ module VGADriver (
   // Remaining signals
   //----------------------------------------------------------------------
 
-  assign VGA_R = pixel_red;
-  assign VGA_G = pixel_green;
-  assign VGA_B = pixel_blue;
+  logic output_color;
+  assign output_color = ( h_state == H_ACTIVE_STATE ) &
+                        ( v_state == V_ACTIVE_STATE );
+  
+  assign VGA_R = ( output_color ) ? pixel_red : '0;
+  assign VGA_G = ( output_color ) ? pixel_green : '0;
+  assign VGA_B = ( output_color ) ? pixel_blue : '0;
 
 endmodule
 
