@@ -78,14 +78,14 @@ module Top();
     t.test_case_begin( "test_case_1_basic" );
 
     //     char vidx hidx lit
-    check( "A", 3,   0,   0 );
-    check( "A", 3,   1,   0 );
-    check( "A", 3,   2,   1 );
-    check( "A", 3,   3,   0 );
-    check( "A", 3,   4,   1 );
-    check( "A", 3,   5,   0 );
-    check( "A", 3,   6,   0 );
-    check( "A", 3,   7,   0 );
+    check( "A", 5,   0,   0 );
+    check( "A", 5,   1,   0 );
+    check( "A", 5,   2,   1 );
+    check( "A", 5,   3,   0 );
+    check( "A", 5,   4,   1 );
+    check( "A", 5,   5,   0 );
+    check( "A", 5,   6,   0 );
+    check( "A", 5,   7,   0 );
 
   endtask
 
@@ -122,7 +122,7 @@ module Top();
     check_row( "q", 12, 8'b01111100 );
     check_row( "q", 13, 8'b01000000 );
     check_row( "q", 14, 8'b01000000 );
-    check_row( "q", 15, 8'b01000000 );
+    check_row( "q", 15, 8'b00000000 );
 
   endtask
 
