@@ -114,7 +114,7 @@ module CharBuf #(
         // Writing Value
         //----------------------------------------------------------------
 
-        else if( buf_write & (i == wrow) ) begin
+        else if( buf_write & (i == wrow) & !is_del & !is_newline ) begin
           mem[i][wcol] <= wdata;
         end
       end
