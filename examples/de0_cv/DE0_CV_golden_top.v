@@ -155,7 +155,7 @@ module DE0_CV_golden_top (
 
   logic clk_25M;
   always_ff @( posedge CLOCK_50 ) begin
-	 clk_25M <= ~clk_25M;
+    clk_25M <= ~clk_25M;
   end
   
   logic rst_25M;
@@ -163,14 +163,14 @@ module DE0_CV_golden_top (
   
   always_ff @( posedge clk_25M ) begin
     rst_25M_tmp <= ~RESET_N;
-	 rst_25M     <= rst_25M_tmp;
+    rst_25M     <= rst_25M_tmp;
   end
   
   logic key_buf, key_buf_tmp1, key_buf_tmp2;
   always_ff @( posedge clk_25M ) begin
     key_buf_tmp1 <= KEY[0];
-	 key_buf_tmp2 <= key_buf_tmp1;
-	 key_buf      <= key_buf_tmp2;
+    key_buf_tmp2 <= key_buf_tmp1;
+    key_buf      <= key_buf_tmp2;
   end
   
   logic ascii_val;
@@ -178,22 +178,22 @@ module DE0_CV_golden_top (
   
   CharDisplay #(
     .p_text_color   (12'hFFF),
-	 .p_bg_color     (12'h222),
-	 .p_screen_color (12'hB22),
-	 .p_num_rows     (32),
-	 .p_num_cols     (32)
+    .p_bg_color     (12'h222),
+    .p_screen_color (12'hB22),
+    .p_num_rows     (32),
+    .p_num_cols     (32)
   ) display (
-	 .clk_25M (clk_25M),
-	 .rst     (rst_25M),
+    .clk_25M   (clk_25M),
+    .rst       (rst_25M),
 	 
-	 .ascii     (SW[7:0]),
-	 .ascii_val (ascii_val),
+    .ascii     (SW[7:0]),
+    .ascii_val (ascii_val),
 	 
-	 .VGA_R  (VGA_R),
-	 .VGA_G  (VGA_G),
-	 .VGA_B  (VGA_B),
-	 .VGA_HS (VGA_HS),
-	 .VGA_VS (VGA_VS)
+    .VGA_R     (VGA_R),
+    .VGA_G     (VGA_G),
+    .VGA_B     (VGA_B),
+    .VGA_HS    (VGA_HS),
+    .VGA_VS    (VGA_VS)
   );
 endmodule 
 

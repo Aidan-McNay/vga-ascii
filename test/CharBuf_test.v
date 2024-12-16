@@ -235,7 +235,7 @@ module CharBufTestSuite #(
   // test_case_5_delete
   //----------------------------------------------------------------------
 
-  localparam DEL = 8'hFF;
+  localparam DEL = 8'h7F;
 
   task test_case_5_delete();
     t.test_case_begin( "test_case_5_delete" );
@@ -430,6 +430,7 @@ module Top();
     if ((s <= 0) || (s == 1)) suite_1.run_test_suite();
     if ((s <= 0) || (s == 2)) suite_2.run_test_suite();
     if ((s <= 0) || (s == 3)) suite_3.run_test_suite();
+    if ((s <= 0) || (s == 4)) suite_4.run_test_suite();
 
     t.test_bench_end();
   end
